@@ -286,8 +286,18 @@ public class mxStencil implements mxIShape
 
 		if (elt != null)
 		{
+			String direction = mxUtils.getString(state.getStyle(),
+					mxConstants.STYLE_DIRECTION, null);
+			mxRectangle computeAspect = computeAspect(state, bounds, direction);
+			double minScale = Math.min(
+					computeAspect.getWidth(), computeAspect.getHeight());
+			double sw = strokewidth.equals("inherit") ? mxUtils.getDouble(
+					state.getStyle(), mxConstants.STYLE_STROKEWIDTH, 1)
+					* state.getView().getScale() : Double
+					.parseDouble(strokewidth) * minScale;
 			lastMoveX = 0;
 			lastMoveY = 0;
+			canvas.setStrokeWidth(sw);
 
 			Node tmp = elt.getFirstChild();
 
@@ -295,7 +305,7 @@ public class mxStencil implements mxIShape
 			{
 				if (tmp.getNodeType() == Node.ELEMENT_NODE)
 				{
-					drawElement(canvas, state, (Element) tmp, aspect);
+					drawElement(canvas, state, (Element) tmp, computeAspect);
 				}
 
 				tmp = tmp.getNextSibling();
